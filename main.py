@@ -56,11 +56,10 @@ def path(parent,current,draw):
         draw()
 
 def is_all_nodes_inf(nodes, scores):
-    ret = True
     for node in nodes:
         if scores[node] != float("inf"):
-            ret = False
-    return ret
+            return False
+    return True
 
 
 def a_star(draw,grid,start,end):
@@ -104,6 +103,79 @@ def a_star(draw,grid,start,end):
         draw()
         if current != start:
             current.consider()
+    return False
+
+def dijkstra(draw,grid,start,end):
+    rank = 0
+    unvisited = PriorityQueue()
+    unvisited.put((0,rank,start))
+    parent = {}
+    distances = {node: float("inf") for row in grid for node in row}
+    distances[start] = 0
+    
+
+    unvisited_dict = {start}         #contains same elements as open_set, because cannot check if something exists in open_set
+    while not unvisited.empty() and not is_all_nodes_inf(unvisited_dict,distances):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            
+        current = unvisited.get()[2]
+        unvisited_dict.remove(current)
+
+        if current == end:
+            path(parent, end, draw)
+            end.make_end()
+            start.make_start()
+            return True
+        
+        for neighbor in current.neighbors: 
+            temp_g_score = distances[current]+1
+            if temp_g_score < distances[neighbor]:
+                parent[neighbor] = current
+                distances[neighbor] = temp_g_score
+               
+
+                if neighbor not in unvisited_dict:
+                    rank += 1
+                    unvisited.put((distances[neighbor],rank,neighbor))
+                    unvisited_dict.add(neighbor)
+                    neighbor.find()
+        
+        draw()
+        if current != start:
+            current.consider()
+    return False
+
+def dfs(draw, grid, start, end):
+    stack = [start]
+    parent = {}
+    visited = set()
+
+    while stack:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        current = stack.pop()
+        visited.add(current)
+
+        if current == end:
+            path(parent, end, draw)
+            end.make_end()
+            start.make_start()
+            return True
+
+        for neighbor in current.neighbors:
+            if neighbor not in visited and neighbor not in stack:
+                parent[neighbor] = current
+                stack.append(neighbor)
+                neighbor.find()
+
+        draw()
+        if current != start:
+            current.consider()
+
     return False
         
 
