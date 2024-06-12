@@ -143,8 +143,10 @@ def dijkstra(draw,grid,start,end):
                     neighbor.find()
         
         draw()
+       
         if current != start:
             current.consider()
+            
     return False
 
 def dfs(draw, grid, start, end):
@@ -173,11 +175,43 @@ def dfs(draw, grid, start, end):
                 neighbor.find()
 
         draw()
+       
         if current != start:
             current.consider()
 
     return False
-        
+
+def bfs(draw, grid, start, end):
+    queue = [start]
+    parent = {}
+    visited = set()
+
+    while queue:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        current = queue[0]
+        queue.remove(current)
+        visited.add(current)
+
+        if current == end:
+            path(parent, end, draw)
+            end.make_end()
+            start.make_start()
+            return True
+
+        for neighbor in current.neighbors:
+            if neighbor not in visited and neighbor not in queue:
+                parent[neighbor] = current
+                queue.append(neighbor)
+                neighbor.find()
+
+        draw()
+        if current != start:
+            current.consider()
+
+    return False
 
 
 
@@ -189,7 +223,7 @@ def clear(grid):
             node.reset()
 
 def main(win,width):
-    ROWS = 80
+    ROWS = 40
     grid = make_grid(ROWS,width)
     start = None
     end = None
